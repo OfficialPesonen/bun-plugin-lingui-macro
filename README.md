@@ -5,6 +5,7 @@
 ## Description
 
 The plugin will add a babel with `@lingui/babel-plugin-lingui-macro` to your bun setup.
+Supports Lingui v5 and v6.
 
 Plugin will process only files where macro import is found.
 
@@ -17,6 +18,12 @@ If you already have babel or SWC in your pipeline consider to use `@lingui/babel
 bun add --dev bun-plugin-lingui-macro
 # npm install --save-dev bun-plugin-lingui-macro
 # yarn add --dev bun-plugin-lingui-macro
+```
+
+If your project uses Lingui v6, also add the matching macro package so the v6 transformer is selected:
+
+```sh
+bun add --dev @lingui/babel-plugin-lingui-macro@6
 ```
 
 ## Usage
