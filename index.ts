@@ -19,6 +19,10 @@ export type Options = {
   loader?: boolean;
 };
 
+const nodeModulesRe = /(?:^|[\\/])node_modules(?:[\\/]|$)/;
+
+const sourceFileRe = new RegExp(`^(?!.*${nodeModulesRe.source}).*${babelRe.source}`, babelRe.flags);
+
 export const pluginLinguiMacro = (options: Options = {}): BunPlugin => ({
   name: "lingui-macro",
 
@@ -26,14 +30,14 @@ export const pluginLinguiMacro = (options: Options = {}): BunPlugin => ({
     const linguiConfig = options.linguiConfig ?? getConfig({ skipValidation: true });
     const poLoaderEnabled = options.loader !== false;
 
-    builder.onLoad({ filter: babelRe }, async ({ path: filePath }) => {
+    builder.onLoad({ filter: sourceFileRe }, async ({ path: filePath, loader }) => {
       const filename = path.relative(process.cwd(), filePath);
       const contents = await Bun.file(filePath).text();
 
       const hasMacroRe = /from ["']@lingui(\/.+)?\/macro["']/;
 
       if (!hasMacroRe.test(contents)) {
-        return { contents, loader: "tsx" };
+        return { contents, loader };
       }
 
       const result = await transformAsync(contents, {
@@ -61,7 +65,7 @@ export const pluginLinguiMacro = (options: Options = {}): BunPlugin => ({
 
       return {
         contents: result.code as string,
-        loader: "tsx",
+        loader,
       };
     });
 
